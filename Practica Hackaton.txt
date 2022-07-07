@@ -1,0 +1,140 @@
+--creacion de la base de datos
+
+create database Hackaton
+
+--poner en uso la base de datos
+use Hackaton
+
+--creacion de las tablas
+create table Cliente (
+CODCLI char(4)  not null,
+NOMCLI varchar(60) not null,
+APECLI varchar(80) not null,
+EMACLI varchar(80) not null,
+CELCLI char(9) not null,
+DIRCLI varchar(70) not null,
+ESTCLI char(1) not null,
+constraint Cliente_pk  PRIMARY KEY (CODCLI)
+);
+
+create table Vendedor (
+CODVEND char(4) not null,
+NOMVEND varchar(60) not null,
+APEVEND varchar(80) not null,
+EMAVEND	varchar(80) not null,
+CELVEND char(9) not null,
+constraint Vendedor_pk PRIMARY KEY (CODVEND)
+);
+
+create table Producto (
+CODPRO char(5) not null,
+DESCPRO varchar(80)not null,
+CATPRO char(1) not null,
+PREPRO decimal(8,2) not null,
+STOCKPRO int not null,
+ESTPRO char(1) not null,
+constraint Producto_pk PRIMARY KEY (CODPRO)
+);
+
+create table Proveedor (
+CODPROV char(5) not null,
+RAZSOCPROV varchar(90) not null,
+RUCPROV varchar(11) not null,
+EMAPROV varchar(70) not null,
+ESTPROV char(1) not null,
+constraint Proveedor_pk PRIMARY KEY (CODPROV)
+);
+
+
+create table Venta (
+CODVEN char(5) not null,
+FECVEN datetime  not null,
+CODCLI char(4),
+CODVEND char(4),
+ESTVEN char(1) not null,
+Constraint Venta_pk PRIMARY KEY (CODVEN)
+);
+
+create table VentaDetalle (
+IDVENDET int not null,
+CODVEN char(5),
+CODPRO char(5),
+CANTPRO int not null,
+Constraint VentaDetalle_pk PRIMARY KEY (IDVENDET)
+);
+
+
+create table Compra (
+CODCOM char(5) not null,
+FECCOM datetime not null,
+CODVEND char(4) not null,
+CODPROV char(5) not null,
+ESTCOM char(1) not null,
+constraint Compra_pk PRIMARY KEY (CODCOM)
+);
+
+Create table CompraDetalle (
+IDCOMDET int not null,
+CODCOM char(5),
+CODPRO char(5),
+CANTPRO int not null,
+Constraint CompraDetalle_pk PRIMARY KEY (IDCOMDET)
+);
+
+/*relaciones */
+--relacion venta - cliente
+Alter table Venta add Constraint Venta_Cliente
+foreign key CODCLI
+references Cliente(CODCLI);
+
+--relacion venta - vendedor
+alter table Venta add Constraint Venta_Vendedor
+foreign key CODVEND
+references Vendedor(CODVEND);
+
+--relacion compra - vendedor 
+alter table Compra add constraint Compra_Vendedor
+foreign key CODVEND
+references Vendedor (CODVEND);
+
+--relacion compra - proveedor
+alter table Compra add constraint Compra_Proveedor
+foreign key CODPROV 
+references Proveedor (CODPROV);
+
+--relacion CompraDetalle - Producto
+alter table CompraDetalle add constraint CompraDetalle_Producto
+foreign key CODPRO
+references Producto (CODPRO);
+
+--relacion VentaDetalle - Producto 
+alter table VentaDetalle add constraint VentaDetalle_Producto
+foreign key CODPRO
+references Producto (CODPRO);
+
+--relacion CompraDetalle - Compra
+alter table CompraDetalle add constraint CompraDetalle_Compra
+foreign key CODCOM
+references Compra (CODCOM);
+
+--relacion VentaDetalle - Venta
+alter table VentaDetalle add constraint VentaDetalle_Venta
+foreign key CODVEN
+references Venta (CODVEN);
+
+
+/*Procedimiento almacenado*/
+--insertar datos en Cliente con store procedure
+
+create procedure sp_Insertar_Cliente
+@CODCLI char(4),
+@NOMCLI varchar(60),
+@APECLI varchar(80),
+@EMACLI varchar(80),
+@CELCLI char(9),
+@DIRCLI varchar(70),
+@ESTCLI char(1)
+as
+insert into Cliente(CODCLI,NOMCLI,APECLI,EMACLI,CELCLI,DIRCLI,ESTCLI)values(@CODCLI,@NOMCLI,@APECLI,@EMACLI,@CELCLI,@DIRCLI,@ESTCLI);
+
+exec sp_Insertar_Cliente 'CL01','Juana','Campos Ortiz','juana.campos@gmail.com','987485152','Av.Miraflores','A';
